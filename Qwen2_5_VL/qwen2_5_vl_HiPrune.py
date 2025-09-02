@@ -569,11 +569,14 @@ class Qwen2_5_VisionTransformerPretrainedModel(Qwen2_5_VLPreTrainedModel):
             else:
                 hidden_states, attn_weights = blk(hidden_states, cu_seqlens=cu_seqlens_now, position_embeddings=position_embeddings)
                 with torch.no_grad():
-                    attn_weights = attn_weights.mean(dim=0)  
+                    attn_weights = attn_weights.mean(dim=0) # Average all heads
 
-                    attn_weights = attn_weights.sum(dim=0) 
+                    attn_weights = attn_weights.mean(dim=0)
+                    # Compute each token's attention, different from the sum in paper because the ones mask in line 1877
+                    # but sum and mean are equal since selection accords to the relative rank
                     attn_weights = attn_weights.view(attn_weights.shape[0]//4, -1).mean(dim=-1)
                     attn_weights = attn_weights[reverse_indices]
+                    attn_weights = F.softmax(attn_weights)
                 attn_list.append(attn_weights)
         hidden_states = self.merger(hidden_states)
         hidden_states = hidden_states[reverse_indices, :]
