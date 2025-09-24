@@ -10,3 +10,4 @@ pip install --no-deps -U -e .
 pip install openpyxl==3.1.5 qwen_vl_utils
 cd ../lmms-eval/miscs
 pip install -r llava_repr_requirements.txt
+pip install calflops

@@ -1,3 +1,24 @@
+'''
+If you encounter ValueError: too many values to unpack (expected 6)
+You can revise line 97-104 in LLaVA/llava/model/language_model/llava_llama.py to
+    (
+        input_ids,
+        position_ids,
+        attention_mask,
+        past_key_values,
+        inputs_embeds,
+        labels,
+        _, # Add this line
+        _ # Add this line
+    ) = self.prepare_inputs_labels_for_multimodal(
+This is because the original code in LLaVA does not go in this line and actually have some bugs
+Nevertheless, we keep the original code in the repo for consistency with LLaVA
+'''
+import os
+os.environ['HIPRUNE_RETENTION'] = '192'
+os.environ['HIPRUNE_ALPHA'] = '0.1'
+os.environ['HIPRUNE_OBJECT_LAYER'] = '9'
+
 import torch
 import re
 from calflops import calculate_flops
@@ -22,7 +43,7 @@ from llava.mm_utils import (
 )
 from llava.model import *
 
-model_path = "liuhaotian/llava-v1.6-vicuna-7b"
+model_path = "liuhaotian/llava-v1.5-7b"
 prompt = "Describe this figure in detail."
 image_file = "LLaVA/images/llava_v1_5_radar.jpg"
 
@@ -75,5 +96,4 @@ inputs = {'input_ids': input_ids,
 flops, macs, params = calculate_flops(model=model,
                                       kwargs = inputs,
                                       print_results=False)
-print("Bert(hfl/chinese-roberta-wwm-ext) FLOPs:%s   MACs:%s   Params:%s \n" %(flops, macs, params))
-#Bert(hfl/chinese-roberta-wwm-ext) FLOPs:22.36 GFLOPS   MACs:11.17 GMACs   Params:102.27 M 
+print("FLOPs:%s   MACs:%s   Params:%s \n" %(flops, macs, params))
