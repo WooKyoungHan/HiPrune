@@ -1,5 +1,5 @@
-conda create -n HiPrune python=3.12 -y
-conda activate HiPrune
+# conda create -n HiPrune python=3.12 -y
+# conda activate HiPrune
 cd lmms-eval
 pip install av==14.4.0
 pip install sentencepiece

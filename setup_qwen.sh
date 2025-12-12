@@ -1,4 +1,4 @@
-conda activate HiPrune
+# conda activate HiPrune
 cd lmms-eval
 pip install av==14.4.0
 pip install -U -e .

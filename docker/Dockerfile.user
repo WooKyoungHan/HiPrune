@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1
+# check=skip=InvalidDefaultArgInFrom
+
+# Installed NeMo version: 2.4.0 (== 2.4.0rc3)
+# Please find the official doc to see the installed versions.
+# https://docs.nvidia.com/nemo-framework/user-guide/latest/softwarecomponentversions.html
+# PyTorch + CUDA 12.6.2 + Python 3.10
+ARG BASE_IMAGE_WITH_TAG=nvcr.io/nvidia/pytorch:24.10-py3
+
+FROM ${BASE_IMAGE_WITH_TAG} AS base
+
+# Alternative user
+ARG USER_ID=0
+ARG USER_NAME=root
+ARG GROUP_ID=0
+ARG GROUP_NAME=root
+
+RUN (getent group ${GROUP_ID} || groupadd --gid ${GROUP_ID} ${GROUP_NAME}) && \
+    (getent passwd ${USER_ID} || useradd --gid ${GROUP_ID} --uid ${USER_ID} --create-home --no-log-init --shell /bin/bash ${USER_NAME}) && \
+    if [ -d /app ]; then chown ${USER_ID}:${GROUP_ID} /app; fi && \
+    apt-get update && \
+    apt-get install -y sudo && \
+    adduser ${USER_NAME} sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+USER ${USER_NAME}
+
+ENV PATH="/home/${USER_NAME}/.local/bin:$PATH"
+
+WORKDIR /workspace
+
+COPY . /workspace
+
+# 2) HiPrune 루트 기준으로 setup_llava.sh 실행
+#    (setup_llava.sh가 HiPrune 루트에 있다고 가정)
+RUN ./setup_llava.sh
