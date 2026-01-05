@@ -5,7 +5,7 @@
 # Please find the official doc to see the installed versions.
 # https://docs.nvidia.com/nemo-framework/user-guide/latest/softwarecomponentversions.html
 # PyTorch + CUDA 12.6.2 + Python 3.10
-ARG BASE_IMAGE_WITH_TAG=nvcr.io/nvidia/pytorch:24.10-py3
+ARG BASE_IMAGE_WITH_TAG=nvcr.io/nvidia/pytorch:25.11-py3
 
 FROM ${BASE_IMAGE_WITH_TAG} AS base
 
@@ -35,4 +35,4 @@ COPY . /workspace
 
 # 2) HiPrune 루트 기준으로 setup_llava.sh 실행
 #    (setup_llava.sh가 HiPrune 루트에 있다고 가정)
-RUN ./setup_llava.sh
+# RUN ./setup_qwen.sh
